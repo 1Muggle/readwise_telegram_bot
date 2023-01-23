@@ -77,21 +77,21 @@ async def send_to_readwise(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     # default note text
-    note_txt = "from Telegram bot"
+    # note_txt = "from Telegram bot"
 
     # if the message contains only text, it will have text_html property, but if the message contains media the text of
     # the message would be in the caption_html property
     text = update.message.text_html if update.message.caption_html is None else update.message.caption_html
     # applend telegram link to the post
-    text = (
-        text
-        + "\n\n"
-        + "<a href='https://t.me/"
-        + str(update.message.forward_from_chat.username)
-        + "/"
-        + str(update.message.forward_from_message_id)
-        + "'>Telegram Link</a>"
-    )
+    # text = (
+    #     text
+    #     + "\n\n"
+    #     + "<a href='https://t.me/"
+    #     + str(update.message.forward_from_chat.username)
+    #     + "/"
+    #     + str(update.message.forward_from_message_id)
+    #     + "'>Telegram Link</a>"
+    # )
     # getting only one link (first link in the post would be here) from the post itself.
     post_link = url_extracter(update.message.parse_entities())
     # getting chat or channel name from the original telegram post
@@ -104,12 +104,10 @@ async def send_to_readwise(update: Update, context: ContextTypes.DEFAULT_TYPE):
         title=from_who,
         source_url=telegram_link,
         highlight_url=post_link,
-        note=note_txt,
+        # note=note_txt,
         highlighted_at=str(datetime.now().isoformat()),
     )
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text="Message from %s was highlighted with note: %s" % (from_who, note_txt)
-    )
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Message sent to Readwise.")
 
 
 @restricted
@@ -156,20 +154,21 @@ if __name__ == "__main__":
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     # register commands
 
-    conv_handler_reader = ConversationHandler(
-        entry_points=[MessageHandler(filters.Regex("^r$"), prepare_reader)],
-        states={
-            FORWARD: [
-                MessageHandler((filters.TEXT | filters.ATTACHMENT | filters.PHOTO) & ~filters.COMMAND, send_to_reader)
-            ],
-        },
-        fallbacks=[CommandHandler("cancel", cancel)],
-    )
+    # conv_handler_reader = ConversationHandler(
+    #     entry_points=[MessageHandler(filters.Regex("^r$"), prepare_reader)],
+    #     states={
+    #         FORWARD: [
+    #             MessageHandler((filters.TEXT | filters.ATTACHMENT | filters.PHOTO) & ~filters.COMMAND, send_to_reader)
+    #         ],
+    #     },
+    #     fallbacks=[CommandHandler("cancel", cancel)],
+    # )
 
-    application.add_handler(conv_handler_reader)
+    # application.add_handler(conv_handler_reader)
     application.add_handler(CommandHandler("start", start))
     application.add_handler(
-        MessageHandler((filters.TEXT | filters.ATTACHMENT | filters.PHOTO) & ~filters.COMMAND, send_to_readwise)
+        # MessageHandler((filters.TEXT | filters.ATTACHMENT | filters.PHOTO) & ~filters.COMMAND, send_to_readwise)
+        MessageHandler((filters.TEXT | filters.ATTACHMENT | filters.PHOTO) & ~filters.COMMAND, send_to_reader)
     )
 
     # run bot
