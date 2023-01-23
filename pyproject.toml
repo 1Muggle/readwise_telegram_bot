@@ -2,7 +2,10 @@
 name = "readwise-telegram-bot"
 version = "0.1.0"
 description = ""
-authors = ["Muggle <indexes.mouths-0r@icloud.com>"]
+authors = [
+    "ILIA KHADZHIEV <ilya.khadzhiev@gmail.com>",
+    "Muggle <indexes.mouths-0r@icloud.com>",
+]
 readme = "README.md"
 packages = [{ include = "readwise_telegram_bot" }]
 
@@ -15,7 +18,7 @@ python-telegram-bot = "^20.0"
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.4"
 flake8 = "^6.0.0"
-black = {version = "^23.1a1", allow-prereleases = true}
+black = { version = "^23.1a1", allow-prereleases = true }
 
 [build-system]
 requires = ["poetry-core"]
