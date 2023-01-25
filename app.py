@@ -3,8 +3,9 @@ import os
 from datetime import datetime
 from functools import wraps
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 from telegram import Update
+from telegram.constants import ChatType
 from telegram.ext import (
     ApplicationBuilder,
     CallbackContext,
@@ -17,14 +18,20 @@ from telegram.ext import (
 
 from readwise import ReadWise
 
-load_dotenv()
+# load_dotenv()
+# load env variables
+config = {
+    **os.environ,
+    **dotenv_values(".env"),
+    **dotenv_values(".env.dev"),
+}
 
 # get bot token from env
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN = config["BOT_TOKEN"]
 # initialize class for Readwise api
-WISE = ReadWise(os.getenv("READWISE_TOKEN"))
+WISE = ReadWise(config["READWISE_TOKEN"])
 # restrict access to our bot to avoid spam
-ADMIN = os.getenv("ADMIN_USER_ID")
+ADMIN = config["ADMIN_USER_ID"]
 
 logging.FileHandler("info_telewise_bot.txt", mode="a", encoding=None, delay=False)
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
@@ -130,12 +137,21 @@ async def send_to_reader(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # the message would be in the caption_html property
     text = update.message.text_html if update.message.caption_html is None else update.message.caption_html
 
+    if update.message.forward_from_chat.type in (
+        ChatType.CHANNEL,
+        ChatType.GROUP,
+        ChatType.SUPERGROUP,
+    ):
+        from_who = str(update.message.forward_from_chat.title)
+    else:
+        from_who = str(update.message.forward_from_chat.username)
+
     WISE.check_token()
     # send post as Readwise highlight
     WISE.save(
         url=telegram_link,
         html=text,
-        title=str(update.message.forward_from_chat.username) + " " + str(datetime.now().isoformat()),
+        title=from_who + " " + str(datetime.now().isoformat()),
         summary=text[:128],
     )
 
