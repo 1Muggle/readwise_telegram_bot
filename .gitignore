@@ -1,3 +1,7 @@
+# project related
+info_telewise_bot.txt
+.env.dev
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
